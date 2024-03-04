@@ -56,6 +56,26 @@ echo
 
 # ---
 
+while getops ":ums" option; do
+
+  case ${option} in
+    
+    u)
+      UPGRADE=true
+    
+    m)
+      MINIMAL=true
+      FULL=false
+
+    s)
+      FULL=false
+
+  esac
+
+done
+
+# ---
+
 case "${OS}" in 
 
   "arch")
@@ -127,7 +147,9 @@ if [ ! ${MINIMAL} ]; then
   install_other_packages
   install_external_other_packages
 
-elif [ ${FULL} ]
+fi
+
+if [ ${FULL} ]; then
 
   install_optional_packages
   install_external_optional_packages
@@ -136,8 +158,9 @@ fi
 
 setup_dotfiles
 
+printf "Finished Setup!!\n"
 printf "Please restart your computer\n"
-printf "Finished Setup!!\nHave a nice day!\n"
+printf "Have a nice day!\n"
 
 # ---
 
