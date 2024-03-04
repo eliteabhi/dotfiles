@@ -1,0 +1,10 @@
+\.git
+\.gitignore
+
+^/README.*
+^/LICENSE.*
+^/COPYING
+
+\.history
+setup_new_system.sh
+
