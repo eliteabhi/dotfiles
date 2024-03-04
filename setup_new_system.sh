@@ -62,13 +62,16 @@ while getops ":ums" option; do
     
     u)
       UPGRADE=true
+      ;;
     
     m)
       MINIMAL=true
       FULL=false
+      ;;
 
     s)
       FULL=false
+      ;;
 
   esac
 
