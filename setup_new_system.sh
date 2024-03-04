@@ -11,33 +11,38 @@ source /etc/os-release
 
 # ---
 
-OS="$ID_LIKE"
+declare -r OS="$ID_LIKE"
 PACKAGE_MANAGER=""
 NO_CONFIRM=""
 
 UPGRADE=true
 
-ESSENTIAL_PACKAGES=( "git" "fish" "vim" "tmux" )
-OTHER_PACKAGES=()
-OPTIONAL_PACKAGES=( "prettyping" "docker" "openssh-server" "zerotier" "alacritty" )
+declare -r ESSENTIAL_PACKAGES=( "fish" "vim" "tmux" "neovim" "stow" "npm" "python3.11" "bat" "exa" )
+declare -r OTHER_PACKAGES=()
+declare -r OPTIONAL_PACKAGES=( "prettyping" "docker" "openssh-server" "zerotier" "alacritty" )
 
-declare -rA ESSENTIAL_EXTERNAL_PACKAGES=( ["pip"]="python3 -m ensurepip"
+declare -rA ESSENTIAL_EXTERNAL_PACKAGES=(
+                                        ["pip"]="python3 -m ensurepip"
                                         ["pipenv"]="pip install pipenv"
-                                        ["neovim"]="sudo add-apt-repository ppa:neovim-ppa/unstable -y &&
-                                          sudo aptitude update &&
-                                          sudo aptitude install neovim"
+                                        ["fisher"]="curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
+                                        ["pbb"]="fisher install oh-my-fish/plugin-bang-bang"
                                       )
 
 declare -rA OTHER_EXTERNAL_PACKAGES=( 
-                                    ["starship"]="sudo curl -sS https://starship.rs/install.sh"
                                     ["nvchad"]="git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 && nvim" 
                                     ["tmuxpm"]="git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm &&"
-                                    ["fisher"]="curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
-                                    ["pbb"]="fisher install oh-my-fish/plugin-bang-bang"
                                     ["tailscale"]="curl -fsSL https://tailscale.com/install.sh | sh && sudo tailscale up"
-                                    )
+                                  )
 
 declare -rA OPTIONAL_EXTERNAL_PACKAGES=()
+
+declare -rA SPECIAL_CASES_PACKAGES=(
+                                    ["zoxide"]="curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash"
+                                    ["starship"]="sudo curl -sS https://starship.rs/install.sh"
+                                    ["neovim"]="sudo add-apt-repository ppa:neovim-ppa/unstable -y &&
+                                       sudo aptitude update &&
+                                       sudo aptitude install neovim"
+                                  )
 
 MINIMAL=false
 FULL=true
@@ -144,6 +149,7 @@ fi
 
 install_essential_packages
 install_external_essential_packages
+install_special_cases
 
 if [ ! ${MINIMAL} ]; then
 
@@ -338,6 +344,35 @@ else
   echo
 
 fi 
+
+}
+
+install_special_cases() {
+
+  if [[ -z "${SPECIAL_CASES_PACKAGES[@]}" ]]; then
+
+  printf "No Special Case Packages...\n"
+
+else
+  SPECIAL_CASES_PACKAGES_STRING=""
+  for package in "${!SPECIAL_CASES_PACKAGES[@]}"; do
+
+    SPECIAL_CASES_PACKAGES_STRING="${SPECIAL_CASES_PACKAGES_STRING} ${package}"
+
+  done
+
+  SPECIAL_CASES_PACKAGES_STRING=${SPECIAL_CASES_PACKAGES_STRING#* }
+  printf "Installing Special Case packages: ${SPECIAL_CASES_PACKAGES_STRING}...\n"
+
+  for package in "${!SPECIAL_CASES_PACKAGES[@]}"; do
+    
+    printf "${package}: \"${SPECIAL_CASES_PACKAGES["${package}"]}\""
+    bash -c "${SPECIAL_CASES_PACKAGES[\"${package}\"]}"
+
+  done
+  echo
+
+fi
 
 }
 
