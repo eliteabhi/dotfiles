@@ -7,6 +7,9 @@
 # Essential External packages: python: pip, pip: pipenv
 # Other External packages: curl: curl: starship, git: nvchad, curl: tpm (Tmux package manager), curl: fisher, fisher: oh-my-fish/plugin-bang-bang, curl: tailscale
 
+LOGFILE_PATH=(pwd)
+exec > >(tee ${LOGFILE_PATH}/setup_log.log) 2>&1
+
 source /etc/os-release
 
 # ---
@@ -15,7 +18,13 @@ declare -r OS="$ID_LIKE"
 PACKAGE_MANAGER=""
 NO_CONFIRM=""
 
+YES="yes"
 UPGRADE=true
+MINIMAL=false
+FULL=true
+
+GIT_EMAIL="abhirangarajan2003@gmail.com"
+GIT_USERNAME="eliteabhi"
 
 declare -r ESSENTIAL_PACKAGES=( "fish" "vim" "tmux" "neovim" "stow" "npm" "python3.11" "bat" "exa" "zoxide" )
 declare -r OTHER_PACKAGES=()
@@ -48,9 +57,6 @@ declare -rA SPECIAL_CASES_PACKAGES=(
 declare -rA UBUNTU_SPECIAL_CASE_PACKAGES=( "neovim" "zoxide" "starship" )
 declare -rA ARCH_SPECIAL_CASE_PACKAGES=()
 
-MINIMAL=false
-FULL=true
-
 DOTFILES_REMOTE_REPO_URL=""
 
 # ---
@@ -65,7 +71,7 @@ echo
 
 # ---
 
-while getops ":ums" option; do
+while getops ":umsd" option; do
 
   case ${option} in
     
@@ -80,6 +86,10 @@ while getops ":ums" option; do
 
     s)
       FULL=false
+      ;;
+
+    d)
+      YES=""
       ;;
 
   esac
@@ -142,6 +152,18 @@ echo
 
 # ---
 
+set_keys="Y"
+if [[ -z yes ]]
+  read -n 1 -p "Setup Git SSH keys?[Y/n]: " set_keys
+
+fi
+
+if [[ "${set_keys}" == "Y" ]]
+  printf "Setting up git SSH keys and GPG keys with Github...\n"
+  setup_ssh_keys
+
+# ---
+
 if [ ${UPGRADE} ]; then
   
   upgrade_packages
@@ -179,6 +201,39 @@ printf "Have a nice day!\n"
 exit 0
 
 # ---
+
+setup_keys() {
+
+  printf "Generating keys with \`${GIT_EMAIL}\` for Github SSH...\n"
+  
+  if [[ ! -d "$HOME/.ssh" ]]; then 
+    
+    mkdir "$HOME/.ssh"
+
+  fi
+
+  ssh-keygen -t ed25519 -C "${GIT_EMAIL}" -q -f "$HOME/.ssh/id_ed25519" -N ""
+
+  printf "Starting ssh-agent and adding key...\n"
+  eval "$(ssh-agent -s)"
+  ssh-add $HOME/.ssh/id_ed25519
+
+  if [[ -z yes ]]; then
+  
+    read -n 1 -p "Use github-cli to setup?[Y/n]: " use_gh
+  
+  else
+
+    use_gh="y"
+
+  fi
+
+  if [[ ${use_gh} != "y" ]]; then
+
+    
+
+  fi
+}
 
 update_packages() {
 
@@ -412,7 +467,7 @@ is_special_case() {
 
 setup_dotfiles() {
 
-  echo "Setting up dotfiles...\n"
+  printf "Setting up dotfiles...\n"
   echo
   CMD=""
   local STOW_ARGS=""
