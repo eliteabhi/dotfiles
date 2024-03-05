@@ -17,7 +17,7 @@ NO_CONFIRM=""
 
 UPGRADE=true
 
-declare -r ESSENTIAL_PACKAGES=( "fish" "vim" "tmux" "neovim" "stow" "npm" "python3.11" "bat" "exa" )
+declare -r ESSENTIAL_PACKAGES=( "fish" "vim" "tmux" "neovim" "stow" "npm" "python3.11" "bat" "exa" "zoxide" )
 declare -r OTHER_PACKAGES=()
 declare -r OPTIONAL_PACKAGES=( "prettyping" "docker" "openssh-server" "zerotier" "alacritty" )
 
@@ -26,6 +26,7 @@ declare -rA ESSENTIAL_EXTERNAL_PACKAGES=(
                                         ["pipenv"]="pip install pipenv"
                                         ["fisher"]="curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
                                         ["pbb"]="fisher install oh-my-fish/plugin-bang-bang"
+                                        ["zoxfish"]="fisher install kidonng/zoxide.fish"
                                       )
 
 declare -rA OTHER_EXTERNAL_PACKAGES=( 
@@ -43,6 +44,9 @@ declare -rA SPECIAL_CASES_PACKAGES=(
                                        sudo aptitude update &&
                                        sudo aptitude install neovim"
                                   )
+
+declare -rA UBUNTU_SPECIAL_CASE_PACKAGES=( "neovim" "zoxide" "starship" )
+declare -rA ARCH_SPECIAL_CASE_PACKAGES=()
 
 MINIMAL=false
 FULL=true
@@ -89,7 +93,8 @@ case "${OS}" in
   "arch")
 
     declare -A PACKAGE_MANAGER_OPTS=( ["install"]="-S" ["remove"]="-Rs" ["update"]="-Sy" ["upgrade"]="-Syuu" )
-    
+    declare -r SPECIAL_CASES=${ARCH_SPECIAL_CASE_PACKAGES}
+
     read -n 1 -p "Do you want to use \`paru\` or \`yay\` as your package manager?[P/y]: " pm
     echo
 
@@ -109,6 +114,7 @@ case "${OS}" in
   "ubuntu")
 
     declare -A PACKAGE_MANAGER_OPTS=( ["install"]="install" ["remove"]="remove" ["upgrade"]="upgrade" )
+    declare -r SPECIAL_CASES=${UBUNTU_SPECIAL_CASE_PACKAGES}
 
     read -n 1 -p "Do you want to use \`aptitude\` as your package manager?[Y/n]: " pm 
     echo
@@ -132,7 +138,6 @@ case "${OS}" in
     ;;
 
 esac
-
 echo
 
 # ---
@@ -171,6 +176,8 @@ printf "Finished Setup!!\n"
 printf "Please restart your computer\n"
 printf "Have a nice day!\n"
 
+exit 0
+
 # ---
 
 update_packages() {
@@ -197,7 +204,11 @@ else
   ESSENTIAL_PACKAGES_STRING=""
   for package in "${ESSENTIAL_PACKAGES[@]}"; do
 
-    ESSENTIAL_PACKAGES_STRING="${ESSENTIAL_PACKAGES_STRING} ${package}"
+    if [[ ! is_special_case "${package}" ]]; then
+      
+      ESSENTIAL_PACKAGES_STRING="${ESSENTIAL_PACKAGES_STRING} ${package}"
+
+    fi
 
   done
 
@@ -222,8 +233,11 @@ else
   OTHER_PACKAGES_STRING=""
   for package in "${OTHER_PACKAGES}"; do
 
+  if [[ ! is_special_case "${package}" ]]; then
+    
     OTHER_PACKAGES_STRING="${OTHER_PACKAGES_STRING} ${package}"
 
+  fi
   done
 
   OTHER_PACKAGES_STRING=${OTHER_PACKAGES_STRING#* }
@@ -246,7 +260,11 @@ else
   OPTIONAL_PACKAGES_STRING=""
   for package in "${OPTIONAL_PACKAGES}"; do
 
-    OPTIONAL_PACKAGES_STRING="${OPTIONAL_PACKAGES_STRING} ${package}"
+    if [[ ! is_special_case "${package}" ]]; then
+      
+      OPTIONAL_PACKAGES_STRING="${OPTIONAL_PACKAGES_STRING} ${package}"
+
+    fi
 
   done
   
@@ -349,25 +367,25 @@ fi
 
 install_special_cases() {
 
-  if [[ -z "${SPECIAL_CASES_PACKAGES[@]}" ]]; then
+  if [[ -z "${SPECIAL_CASES[@]}" ]]; then
 
-  printf "No Special Case Packages...\n"
+  printf "No Special Case Packages for \`${OS}\`...\n"
 
 else
-  SPECIAL_CASES_PACKAGES_STRING=""
-  for package in "${!SPECIAL_CASES_PACKAGES[@]}"; do
+  SPECIAL_CASES_STRING=""
+  for package in "${!SPECIAL_CASES[@]}"; do
 
-    SPECIAL_CASES_PACKAGES_STRING="${SPECIAL_CASES_PACKAGES_STRING} ${package}"
+    SPECIAL_CASES_STRING="${SPECIAL_CASES} ${package}"
 
   done
 
-  SPECIAL_CASES_PACKAGES_STRING=${SPECIAL_CASES_PACKAGES_STRING#* }
-  printf "Installing Special Case packages: ${SPECIAL_CASES_PACKAGES_STRING}...\n"
+  SPECIAL_CASES_STRING=${SPECIAL_CASES_STRING#* }
+  printf "Installing Special Case packages: ${SPECIAL_CASES_STRING}...\n"
 
-  for package in "${!SPECIAL_CASES_PACKAGES[@]}"; do
+  for package in "${!SPECIAL_CASES[@]}"; do
     
-    printf "${package}: \"${SPECIAL_CASES_PACKAGES["${package}"]}\""
-    bash -c "${SPECIAL_CASES_PACKAGES[\"${package}\"]}"
+    printf "${package}: \"${SPECIAL_CASES["${package}"]}\""
+    bash -c "${SPECIAL_CASES[\"${package}\"]}"
 
   done
   echo
@@ -376,9 +394,26 @@ fi
 
 }
 
+is_special_case() {
+
+  package="$1"
+
+  if [[ -v SPECIAL_CASES["${package}"] ]]; then
+
+    echo 0
+ 
+  else
+    
+    echo 1
+
+  fi  
+
+}
+
 setup_dotfiles() {
 
   echo "Setting up dotfiles...\n"
+  echo
   CMD=""
   local STOW_ARGS=""
   
@@ -390,7 +425,7 @@ setup_dotfiles() {
     STOW_ARGS="--adopt"
 
   else
-    STOW_ARGS="--override=*"
+    STOW_ARGS="--adopt && git restore ."
   
   fi
 
@@ -399,8 +434,4 @@ setup_dotfiles() {
   bash -c "${CMD}"
 
 }
-
-# ---
-
-exit 0
 
