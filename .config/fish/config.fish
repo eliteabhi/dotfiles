@@ -27,9 +27,8 @@ if test -d ~/Applications/depot_tools
     end
 end
 
-export PATH=/usr/bin:/home/abhi/.local/bin:$PATH 
 export DOCKER_HOST=unix:///run/user/1000/docker.sock
-export GPG_TTY=$(tty)
+export GPG_TTY=(tty)
 
 if test -e ~/.config/tmux/tmux.conf
   tmux source ~/.config/tmux/tmux.conf
@@ -37,7 +36,7 @@ end
 
 ## Starship prompt
 if status --is-interactive
-   source (/usr/bin/starship init fish --print-full-init | psub)
+   source (starship init fish --print-full-init | psub)
 end
 
 
