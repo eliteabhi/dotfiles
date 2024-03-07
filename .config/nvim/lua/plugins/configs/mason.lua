@@ -16,6 +16,7 @@ local options = {
 
     "python-lsp-server",
     "sourcery",
+    "pylint",
 
     "asm-lsp",
     "asm-fmt",
