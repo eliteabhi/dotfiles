@@ -162,6 +162,7 @@ alias ping="prettyping"
 alias l="ls"
 alias service="systemctl"
 alias yay="paru"
+alias calc="numbat"
 
 #alias droidcam-cli="sudo modprobe v4l2loopback && sudo droidcam-cli"
 alias pip="pip3"
