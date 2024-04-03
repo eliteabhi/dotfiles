@@ -105,6 +105,7 @@ alias l.="exa -a | egrep '^\.'"                                     # show only 
 
 # Replace some more things with better alternatives
 alias cat='batcat --style snip --style changes --style header'
+alias bat='batcat'
 [ ! -x /usr/bin/yay ] && [ -x /usr/bin/paru ] && alias yay='paru --bottomup'
 
 # Common use
@@ -156,7 +157,7 @@ alias clear="clear && macchina"
 alias reddit="tuir"
 alias matlab="matlab -nodesktop -nosplash"
 alias school="cd /home/abhi/Documents/School/1stYear/Spring/"
-alias pull="git fetch && git pull"
+alias gpull="git fetch && git pull"
 alias ping="prettyping"
 alias l="ls"
 alias service="systemctl"

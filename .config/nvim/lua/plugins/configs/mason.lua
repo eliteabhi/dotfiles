@@ -19,11 +19,12 @@ local options = {
     "pylint",
 
     "asm-lsp",
-    "asm-fmt",
+    "asmfmt",
 
     "clangd",
     "clang-format",
     "cmake-language-server",
+    "cmakelang",
     "codelldb",
 
     "cpplint",
