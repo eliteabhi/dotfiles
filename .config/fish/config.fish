@@ -7,7 +7,7 @@ set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 # Set settings for https://github.com/franciscolourenco/done
 set -U __done_min_cmd_duration 10000
 set -U __done_notification_urgency_level low
-
+set --universal zoxide_cmd cd
 
 ## Environment setup
 # Apply .profile
@@ -104,7 +104,7 @@ alias lt='exa -aT --color=always --group-directories-first --icons' # tree listi
 alias l.="exa -a | egrep '^\.'"                                     # show only dotfiles
 
 # Replace some more things with better alternatives
-alias cat='bat --style snip --style changes --style header'
+alias cat='batcat --style snip --style changes --style header'
 [ ! -x /usr/bin/yay ] && [ -x /usr/bin/paru ] && alias yay='paru --bottomup'
 
 # Common use
