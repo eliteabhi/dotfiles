@@ -4,6 +4,8 @@ set fish_greeting
 set VIRTUAL_ENV_DISABLE_PROMPT "1"
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
+fish_config theme choose "ayu Dark"
+
 # Set settings for https://github.com/franciscolourenco/done
 set -U __done_min_cmd_duration 10000
 set -U __done_notification_urgency_level low
@@ -11,7 +13,7 @@ set --universal zoxide_cmd cd
 
 ## Environment setup
 # Apply .profile
-source ~/.profile
+[ -x ~/.profile ] && source ~/.profile
 
 # Add ~/.local/bin to PATH
 if test -d ~/.local/bin
