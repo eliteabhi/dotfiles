@@ -106,8 +106,8 @@ alias lt='exa -aT --color=always --group-directories-first --icons' # tree listi
 alias l.="exa -a | egrep '^\.'"                                     # show only dotfiles
 
 # Replace some more things with better alternatives
-alias cat='batcat --style snip --style changes --style header'
-alias bat='batcat'
+[ -x /usr/bin/batcat ] && alias cat='batcat --style snip --style changes --style header'
+[ -x /usr/bin/bat ] && alias cat='bat --style snip --style changes --style header'
 [ ! -x /usr/bin/yay ] && [ -x /usr/bin/paru ] && alias yay='paru --bottomup'
 
 # Common use

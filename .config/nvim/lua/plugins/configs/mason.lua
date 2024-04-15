@@ -6,39 +6,6 @@ local options = {
     "prettier",
     "html-lsp",
     "css-lsp",
-
-    "deno",
-    "typescript-language-server",
-
-    "bash-language-server",
-    "shellcheck",
-    "shfmt",
-
-    "python-lsp-server",
-    "sourcery",
-    "pylint",
-
-    "asm-lsp",
-    "asmfmt",
-
-    "clangd",
-    "clang-format",
-    "cmake-language-server",
-    "cmakelang",
-    "codelldb",
-
-    "cpplint",
-    "cpptools",
-
-    "arduino-language-server",
-
-    "dockerfile-language-server",
-    "docker-compose-language-service",
-
-    "rust-analyzer",
-
-    "sonarlint-language-server"
-
   }, -- not an option from mason.nvim
 
   PATH = "skip",
