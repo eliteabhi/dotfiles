@@ -173,3 +173,5 @@ alias pip="pip3"
 if status --is-interactive
    macchina
 end
+
+thefuck --alias | source
